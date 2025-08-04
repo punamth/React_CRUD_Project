@@ -39,7 +39,6 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 		if (productData) {
 			setName(productData.name || "");
 			setPrice(productData.price?.toString() || "");
-			// We'll set the category name after categories are loaded
 			setSku(productData.sku || "");
 			setStockQuantity(productData.stockQuantity?.toString() || "");
 			setDescription(productData.description || "");
@@ -94,7 +93,6 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 			await update(productData);
 			alert("Product updated successfully");
 			
-			// Call success callback
 			if (onSuccess) {
 				onSuccess();
 			} else {
@@ -142,6 +140,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 			)}
 			
 			<form onSubmit={handleSubmit}>
+				{/* Name */}
 				<div className="mb-4">
 					<label className="block text-gray-700 font-medium mb-2">
 						Name
@@ -154,6 +153,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 					/>
 				</div>
 				
+				{/* Price */}
 				<div className="mb-4">
 					<label className="block text-gray-700 font-medium mb-2">
 						Price
@@ -168,6 +168,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 					/>
 				</div>
 
+				{/* SKU */}
 				<div className="mb-4">
 					<label className="block text-gray-700 font-medium mb-2">
 						SKU
@@ -180,6 +181,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 					/>
 				</div>
 
+				{/* Stock Quantity */}
 				<div className="mb-4">
 					<label className="block text-gray-700 font-medium mb-2">
 						Stock Quantity
@@ -193,6 +195,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 					/>
 				</div>
 
+				{/* Description */}
 				<div className="mb-4">
 					<label className="block text-gray-700 font-medium mb-2">
 						Description
@@ -205,6 +208,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 					/>
 				</div>
 				
+				{/* Category */}
 				<div className="mb-4">
 					<label className="block text-gray-700 font-medium mb-2">
 						Category
@@ -225,6 +229,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 					/>
 				</div>
 				
+				{/* Image */}
 				<div className="mb-6">
 					<label className="block text-gray-700 font-medium mb-2">
 						Image
@@ -253,6 +258,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 					)}
 				</div>
 				
+				{/* Form Buttons */}
 				<div className="flex gap-4">
 					<button
 						type="submit"

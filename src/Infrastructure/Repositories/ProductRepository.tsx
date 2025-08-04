@@ -16,6 +16,7 @@ export class ProductRepository implements IProductRepository {
 	
 	async create(product: Omit<Product, "id">): Promise<void> {
 		try {
+			// Create product without image first
 			const createDto = {
 				CategoryId: product.categoryId,
 				Name: product.name,
@@ -24,12 +25,20 @@ export class ProductRepository implements IProductRepository {
 				StockQuantity: product.stockQuantity,
 				Description: product.description
 			};
-			await axiosInstance.post("/Product", createDto);
+			
+			const response = await axiosInstance.post("/Product", createDto);
+			
+			// If image is provided, upload it separately using the dedicated endpoint
+			if (product.image && response.data?.id) {
+				await this.uploadImage(response.data.id, product.image);
+			}
 		} catch (error) {
 			console.error("Failed to create product:", error);
 			throw new Error("Failed to create product");
 		}
 	}
+
+
 	
 	async update(product: Product): Promise<void> {
 		try {
@@ -37,6 +46,7 @@ export class ProductRepository implements IProductRepository {
 				throw new Error("Product ID is required for update");
 			}
 			
+			// Update product without image first
 			const updateDto = {
 				CategoryId: product.categoryId,
 				Name: product.name,
@@ -45,12 +55,20 @@ export class ProductRepository implements IProductRepository {
 				StockQuantity: product.stockQuantity,
 				Description: product.description
 			};
+			
 			await axiosInstance.put(`/Product/${product.id}`, updateDto);
+			
+			// If image is provided, upload it separately using the dedicated endpoint
+			if (product.image) {
+				await this.uploadImage(product.id, product.image);
+			}
 		} catch (error) {
 			console.error("Failed to update product:", error);
 			throw new Error("Failed to update product");
 		}
 	}
+
+
 	
 	async delete(id: number): Promise<void> {
 		try {

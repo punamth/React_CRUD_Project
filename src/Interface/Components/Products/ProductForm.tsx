@@ -4,7 +4,6 @@ import { ProductRepository } from "../../../Infrastructure/Repositories/ProductR
 import { createProduct } from "../../../Application/Usecases/product/createProduct";
 import CategoryDropdown from "../common/CategoryDropdown";
 
-
 const repo = new ProductRepository();
 const add = createProduct(repo);
 
@@ -26,7 +25,6 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 	const [error, setError] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Only memoize the most important handlers that are passed to child components
 	const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
@@ -65,6 +63,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 			await add(productData);
 			alert("Product added successfully");
 			
+			// Reset form
 			setName("");
 			setPrice("");
 			setSku("");
@@ -119,6 +118,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 				)}
 				
 				<form onSubmit={handleSubmit} className="space-y-6">
+					{/* Product Name */}
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							Product Name
@@ -132,6 +132,8 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 							required
 						/>
 					</div>
+					
+					{/* SKU */}
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							SKU
@@ -146,6 +148,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 						/>
 					</div>
 					
+					{/* Price */}
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							Price (NPR)
@@ -165,6 +168,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 						</div>
 					</div>
 					
+					{/* Stock Quantity */}
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							Stock Quantity
@@ -180,6 +184,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 						/>
 					</div>
 					
+					{/* Category */}
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							Category
@@ -191,6 +196,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 						/>
 					</div>
 					
+					{/* Product Image */}
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							Product Image
@@ -243,6 +249,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 						)}
 					</div>
 					
+					{/* Form Buttons */}
 					<div className="flex gap-3 pt-4">
 						<button
 							type="submit"
