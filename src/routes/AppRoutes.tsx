@@ -11,7 +11,7 @@ import ViewCategories from "../Interface/pages/Categories/ViewCategories";
 import AddCategory from "../Interface/pages/Categories/AddCategory";
 import EditCategories from "../Interface/pages/ProductCategories/EditCategories";
 import DeleteCategories from "../Interface/pages/ProductCategories/DeleteCategories";
-import UpdateCategory from "../Interface/pages/ProductCategories/UpdateCategory";
+import UpdateCategory from "../Interface/pages/Categories/UpdateCategory";
 import ViewGroups from "../Interface/pages/Groups/ViewGroups";
 import AddGroup from "../Interface/pages/Groups/AddGroup";
 import UpdateGroup from "../Interface/pages/Groups/UpdateGroup";
