@@ -2,13 +2,9 @@ import type { IProductRepository } from "../../../Domain/Repositories/IProductRe
 import type { Product } from "../../../Domain/Types/Product";
 
 export function updateProduct(repo: IProductRepository) {
-	return async (product: Product): Promise<void> => {
+	return async (product: Product, token: string): Promise<void> => {
 		try {
-			if (!product.id || !product.name || !product.sku || product.price <= 0 || product.stockQuantity < 0) {
-				throw new Error("Invalid product data for update");
-			}
-			
-					await repo.update(product);
+			await repo.update(product, token);
 		} catch (error) {
 			console.error("Failed to update product:", error);
 			throw error;

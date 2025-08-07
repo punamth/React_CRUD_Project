@@ -5,6 +5,7 @@ import type { ProductResponse } from "../../../Domain/Types/ProductResponse";
 import { ProductRepository } from "../../../Infrastructure/Repositories/ProductRepository";
 import { updateProduct } from "../../../Application/Usecases/product/updateProduct";
 import CategoryNameDropdown from "../common/CategoryNameDropdown";
+import { useAuth } from "../../Components/Contexts/AuthContext";
 
 const repo = new ProductRepository();
 const update = updateProduct(repo);
@@ -33,6 +34,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { token } = useAuth();
 
 	// Initialize form with product data
 	useEffect(() => {
@@ -90,7 +92,7 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 		};
 
 		try {
-			await update(productData);
+			await update(productData, token);
 			alert("Product updated successfully");
 			
 			if (onSuccess) {

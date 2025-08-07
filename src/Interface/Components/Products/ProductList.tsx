@@ -4,6 +4,7 @@ import { ProductRepository } from "../../../Infrastructure/Repositories/ProductR
 import { getAllProducts } from "../../../Application/Usecases/product/getAllProducts";
 import ProductTable from "./ProductTable";
 import Pagination from "../common/Pagination";
+import { useAuth } from "../../Components/Contexts/AuthContext";
 
 const repo = new ProductRepository();
 const showAll = getAllProducts(repo);
@@ -19,13 +20,14 @@ function ProductList({ title = "Product List", className = "" }: ProductListProp
 	const [currentPage, setCurrentPage] = useState(1);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	useEffect(() => {
 		const fetchProducts = async () => {
 			setError(null);
 			setLoading(true);
 			try {
-				const data = await showAll();
+				const data = await showAll(token);
 				setProducts(data);
 			} catch (error) {
 				setError("Failed to load products");
@@ -33,8 +35,10 @@ function ProductList({ title = "Product List", className = "" }: ProductListProp
 				setLoading(false);
 			}
 		};
-		fetchProducts();
-	}, []);
+		if (token) {
+			fetchProducts();
+		}
+	}, [token]);
 
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;

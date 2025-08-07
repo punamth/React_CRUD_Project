@@ -7,6 +7,7 @@ import { deleteProduct } from "../../../Application/Usecases/product/deleteProdu
 import { getAllProducts } from "../../../Application/Usecases/product/getAllProducts";
 import { getAllProductCategories } from "../../../Application/Usecases/productCategory/getAllProductCategories";
 import Pagination from "../common/Pagination";
+import { useAuth } from "../../Components/Contexts/AuthContext";
 
 const repo = new ProductRepository();
 const categoryRepo = new ProductCategoryRepository();
@@ -25,6 +26,7 @@ function DeleteProduct({ className = "" }: DeleteProductProps) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -32,8 +34,8 @@ function DeleteProduct({ className = "" }: DeleteProductProps) {
 			setLoading(true);
 			try {
 				const [productsData, categoriesData] = await Promise.all([
-					getAllProd(),
-					getAllCategories()
+					getAllProd(token),
+					getAllCategories(token)
 				]);
 				setProducts(productsData);
 				setCategories(categoriesData);
@@ -43,8 +45,10 @@ function DeleteProduct({ className = "" }: DeleteProductProps) {
 				setLoading(false);
 			}
 		};
-		fetchData();
-	}, []);
+		if (token) {
+			fetchData();
+		}
+	}, [token]);
 
 	const getCategoryName = (categoryId: number) => {
 		const category = categories.find(cat => cat.id === categoryId);

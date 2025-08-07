@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		const token = localStorage.getItem("token");
 		if (token) {
 			setToken(token);
-			// TODO: Optionally fetch user data from token or localStorage
+			// Optionally fetch user data from token/localStorage
 		}
 	}, []);
 
@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		console.log("Auth user:", authUser);
 		setToken(authUser.token);
 		setUser(authUser);
+		localStorage.setItem("token", authUser.token); // Keep in sync for persistence
 	};
 	const register = async (
 		name: string,
@@ -52,8 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		await registerUc(name, email, password, confirmPassword);
 	};
 	const logout = () => {
-		authRepo.logout();
-		console.log("logged out");
+		localStorage.removeItem("token"); // Remove from storage
 		setToken("");
 		setUser(null);
 	};

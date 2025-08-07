@@ -3,6 +3,7 @@ import type { ProductFormInput } from "../../../Domain/Types/ProductFormInput";
 import { ProductRepository } from "../../../Infrastructure/Repositories/ProductRepository";
 import { createProduct } from "../../../Application/Usecases/product/createProduct";
 import CategoryDropdown from "../common/CategoryDropdown";
+import { useAuth } from "../../Components/Contexts/AuthContext";
 
 const repo = new ProductRepository();
 const add = createProduct(repo);
@@ -24,6 +25,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { token } = useAuth();
 
 	const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -60,7 +62,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 		};
 
 		try {
-			await add(productData);
+			await add(productData, token);
 			alert("Product added successfully");
 			
 			// Reset form
@@ -80,7 +82,7 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 		} finally {
 			setLoading(false);
 		}
-	}, [name, price, categoryId, sku, stockQuantity, image, onSuccess]);
+	}, [name, price, categoryId, sku, stockQuantity, image, onSuccess, token]);
 
 	const handleCancel = useCallback(() => {
 		if (onCancel) {

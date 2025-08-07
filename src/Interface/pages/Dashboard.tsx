@@ -5,6 +5,7 @@ import { getAllProducts } from '../../Application/Usecases/product/getAllProduct
 import { getAllProductCategories } from '../../Application/Usecases/productCategory/getAllProductCategories';
 import type { ProductResponse } from '../../Domain/Types/ProductResponse';
 import type { ProductCategoryResponse } from '../../Domain/Types/ProductCategoryResponse';
+import { useAuth } from '../../Interface/Components/Contexts/AuthContext';
 
 const productRepo = new ProductRepository();
 const categoryRepo = new ProductCategoryRepository();
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [categories, setCategories] = useState<ProductCategoryResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -25,8 +27,8 @@ export default function Dashboard() {
         
         // Fetch products and categories in parallel
         const [productsData, categoriesData] = await Promise.all([
-          getAllProductsUseCase(),
-          getAllCategoriesUseCase()
+          getAllProductsUseCase(token),
+          getAllCategoriesUseCase(token)
         ]);
         
         setProducts(productsData);
@@ -39,8 +41,10 @@ export default function Dashboard() {
       }
     };
 
-    fetchDashboardData();
-  }, []);
+    if (token) {
+      fetchDashboardData();
+    }
+  }, [token]);
 
   // Calculate statistics
   const totalProducts = products.length;

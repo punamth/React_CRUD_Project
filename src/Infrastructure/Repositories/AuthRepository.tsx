@@ -10,17 +10,14 @@ export class AuthRepository implements IAuthRepository {
 				Password: password,
 			});
 			const data = res.data;
-			
 			// Backend currently only returns { token }, so we create AuthUser with available data
 			const authUser: AuthUser = {
-				id: 0, // Will be set from token if needed
-				username: email, // Using email as username for now
+				id: 0, 
+				username: email, 
 				email: email,
 				token: data.token,
 				createdAt: undefined
 			};
-			
-			localStorage.setItem("token", data.token);
 			return authUser;
 		} catch (error) {
 			console.error("Login failed:", error);
@@ -36,7 +33,7 @@ export class AuthRepository implements IAuthRepository {
 		try {
 			console.log({ name, email, password, confirmPassword });
 			await axios.post("https://localhost:5001/api/Auth/register", {
-				Username: name, // Backend expects Username field
+				Username: name, 
 				Email: email,
 				Password: password,
 			});
@@ -46,6 +43,6 @@ export class AuthRepository implements IAuthRepository {
 		}
 	}
 	logout(): void {
-		localStorage.removeItem("token");
+		// No localStorage operation here. Context will handle token removal.
 	}
 }
