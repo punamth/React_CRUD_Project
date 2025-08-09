@@ -72,7 +72,7 @@ const Login: React.FC = () => {
           <input
             id="username"
             name="username"
-            type="text"
+            type="username"
             placeholder="Username"
             autoComplete="username"
             required

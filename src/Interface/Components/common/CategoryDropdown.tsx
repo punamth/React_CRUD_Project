@@ -1,5 +1,11 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import type { ProductCategoryResponse } from "../../../Domain/Types/ProductCategoryResponse";
+import { ProductCategoryRepository } from "../../../Infrastructure/Repositories/ProductCategoryRepository";
+import { getAllProductCategories } from "../../../Application/Usecases/productCategory/getAllProductCategories";
+import { useAuth } from "../Contexts/AuthContext";
+
+const categoryRepo = new ProductCategoryRepository();
+const getAllCategories = getAllProductCategories(categoryRepo);
 
 interface CategoryDropdownProps {
 	onSelect: (categoryId: number | null) => void;
@@ -12,28 +18,21 @@ function CategoryDropdown({ onSelect, selectedCategoryId, onCategoriesLoaded, cl
 	const [categories, setCategories] = useState<ProductCategoryResponse[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	// Memoize the fetch function to prevent unnecessary re-creations
 	const fetchCategories = useCallback(async () => {
-		const token = localStorage.getItem("token");
+		if (!token) {
+			setError("No authentication token available");
+			setLoading(false);
+			return;
+		}
+
 		try {
-			const response = await fetch(
-				"https://localhost:5001/api/ProductCategory",
-				{
-					method: "GET",
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
-			);
-			const data = await response.json();
-			const selectedData = data.map(({ id, name }: any) => ({
-				id,
-				name,
-			}));
-			setCategories(selectedData);
+			const data = await getAllCategories(token);
+			setCategories(data);
 			if (onCategoriesLoaded) {
-				onCategoriesLoaded(selectedData);
+				onCategoriesLoaded(data);
 			}
 		} catch (error) {
 			console.error(error);
@@ -41,7 +40,7 @@ function CategoryDropdown({ onSelect, selectedCategoryId, onCategoriesLoaded, cl
 		} finally {
 			setLoading(false);
 		}
-	}, [onCategoriesLoaded]);
+	}, [onCategoriesLoaded, token]);
 
 	useEffect(() => {
 		fetchCategories();

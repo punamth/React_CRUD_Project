@@ -4,6 +4,7 @@ import type { ProductGroup } from "../../../Domain/Types/ProductGroup";
 import type { ProductGroupResponse } from "../../../Domain/Types/ProductGroupResponse";
 import { ProductGroupRepository } from "../../../Infrastructure/Repositories/ProductGroupRepository";
 import { updateProductGroup } from "../../../Application/Usecases/productGroup/updateProductGroup";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductGroupRepository();
 const update = updateProductGroup(repo);
@@ -19,6 +20,7 @@ function UpdateGroupForm({ onSuccess, onCancel, className = "" }: UpdateGroupFor
 	const { id } = useParams<{ id: string }>();
 	const location = useLocation();
 	const groupData = location.state?.group as ProductGroupResponse;
+	const { token } = useAuth();
 	
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
@@ -38,6 +40,12 @@ function UpdateGroupForm({ onSuccess, onCancel, className = "" }: UpdateGroupFor
 		setLoading(true);
 		setError(null);
 
+		if (!token) {
+			setError("No authentication token available");
+			setLoading(false);
+			return;
+		}
+
 		if (!id) {
 			setError("Group ID is required");
 			setLoading(false);
@@ -51,7 +59,7 @@ function UpdateGroupForm({ onSuccess, onCancel, className = "" }: UpdateGroupFor
 		};
 
 		try {
-			await update(groupUpdateData);
+			await update(groupUpdateData, token);
 			alert("Group updated successfully");
 			
 			// Call success callback

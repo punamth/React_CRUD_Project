@@ -23,8 +23,8 @@ const loginUC = loginUseCase(authRepo);
 const registerUc = registerUseCase(authRepo);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	const [token, setToken] = useState<string>(
-		localStorage.getItem("token") || ""
+	const [token, setToken] = useState<string | null>(
+		localStorage.getItem("token")
 	);
 	const [user, setUser] = useState<AuthUser | null>(null);
 
@@ -37,24 +37,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	const login = async (email: string, password: string) => {
-		const authUser = await loginUC(email, password);
-		console.log("Auth user:", authUser);
-		setToken(authUser.token);
-		setUser(authUser);
-		localStorage.setItem("token", authUser.token); // Keep in sync for persistence
+		try {
+			const authUser = await loginUC(email, password);
+			console.log("Auth user:", authUser);
+			setToken(authUser.token);
+			setUser(authUser);
+			localStorage.setItem("token", authUser.token); // Keep in sync for persistence
+		} catch (error) {
+			console.error("Login error:", error);
+			throw error; // Re-throw to let components handle it
+		}
 	};
+	
 	const register = async (
 		name: string,
 		email: string,
 		password: string,
 		confirmPassword: string
 	) => {
-		console.log("inside auth ");
-		await registerUc(name, email, password, confirmPassword);
+		try {
+			console.log("inside auth ");
+			await registerUc(name, email, password, confirmPassword);
+		} catch (error) {
+			console.error("Register error:", error);
+			throw error; // Re-throw to let components handle it
+		}
 	};
 	const logout = () => {
 		localStorage.removeItem("token"); // Remove from storage
-		setToken("");
+		setToken(null);
 		setUser(null);
 	};
 

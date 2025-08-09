@@ -5,6 +5,7 @@ import type { ProductCategoryResponse } from "../../../Domain/Types/ProductCateg
 import { ProductCategoryRepository } from "../../../Infrastructure/Repositories/ProductCategoryRepository";
 import { updateProductCategory } from "../../../Application/Usecases/productCategory/updateProductCategory";
 import GroupDropdown from "../common/GroupDropdown";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductCategoryRepository();
 const updateCategory = updateProductCategory(repo);
@@ -14,6 +15,7 @@ function UpdateCategoryForm() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const categoryData = location.state?.category as ProductCategoryResponse;
+	const { token } = useAuth();
 
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
@@ -34,6 +36,12 @@ function UpdateCategoryForm() {
 		setLoading(true);
 		setError(null);
 
+		if (!token) {
+			setError("No authentication token available");
+			setLoading(false);
+			return;
+		}
+
 		if (!id || !groupId) {
 			setError("Please select a group");
 			setLoading(false);
@@ -48,7 +56,7 @@ function UpdateCategoryForm() {
 		};
 
 		try {
-			await updateCategory(updatedCategoryData);
+			await updateCategory(updatedCategoryData, token);
 			alert("Category updated successfully");
 			navigate("/categories");
 		} catch (error) {
@@ -56,7 +64,7 @@ function UpdateCategoryForm() {
 		} finally {
 			setLoading(false);
 		}
-	}, [id, name, description, groupId, navigate]);
+	}, [id, name, description, groupId, navigate, token]);
 
 	const handleCancel = useCallback(() => {
 		navigate("/categories");

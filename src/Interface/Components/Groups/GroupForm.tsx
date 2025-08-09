@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import type { ProductGroup } from "../../../Domain/Types/ProductGroup";
 import { ProductGroupRepository } from "../../../Infrastructure/Repositories/ProductGroupRepository";
 import { createProductGroup } from "../../../Application/Usecases/productGroup/createProductGroup";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductGroupRepository();
 const add = createProductGroup(repo);
@@ -17,11 +18,18 @@ function GroupForm({ onSuccess, onCancel, className = "" }: GroupFormProps) {
 	const [description, setDescription] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
 		setError(null);
+
+		if (!token) {
+			setError("No authentication token available");
+			setLoading(false);
+			return;
+		}
 
 		const groupData: Omit<ProductGroup, 'id'> = {
 			name: name,
@@ -29,7 +37,7 @@ function GroupForm({ onSuccess, onCancel, className = "" }: GroupFormProps) {
 		};
 
 		try {
-			await add(groupData);
+			await add(groupData, token);
 			alert("Group added successfully");
 			
 			// Reset form

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { ProductGroupResponse } from "../../../Domain/Types/ProductGroupResponse";
 import { ProductGroupRepository } from "../../../Infrastructure/Repositories/ProductGroupRepository";
 import { deleteProductGroup } from "../../../Application/Usecases/productGroup/deleteProductGroup";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductGroupRepository();
 const deleteGroup = deleteProductGroup(repo);
@@ -15,6 +16,7 @@ interface GroupTableProps {
 
 function GroupTable({ groups, className = "", onGroupDeleted }: GroupTableProps) {
 	const navigate = useNavigate();
+	const { token } = useAuth();
 
 	const handleEdit = (group: ProductGroupResponse) => {
 		navigate(`/groups/edit/${group.id}`, { 
@@ -23,11 +25,16 @@ function GroupTable({ groups, className = "", onGroupDeleted }: GroupTableProps)
 	};
 
 	const handleDelete = async (id: number) => {
+		if (!token) {
+			alert("No authentication token available");
+			return;
+		}
+
 		const confirm = window.confirm("Are you sure you want to delete this group?");
 		if (!confirm) return;
 
 		try {
-			await deleteGroup(id);
+			await deleteGroup(id, token);
 			if (onGroupDeleted) {
 				onGroupDeleted(id);
 			}

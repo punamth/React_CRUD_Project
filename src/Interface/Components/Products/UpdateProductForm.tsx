@@ -66,6 +66,12 @@ function UpdateProductForm({ onSuccess, onCancel, className = "" }: UpdateProduc
 		setLoading(true);
 		setError(null);
 
+		if (!token) {
+			setError("No authentication token available");
+			setLoading(false);
+			return;
+		}
+
 		if (!id || !categoryName) {
 			setError("Product ID and category are required");
 			setLoading(false);

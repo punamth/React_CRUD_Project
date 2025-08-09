@@ -9,9 +9,10 @@ const deleteProd = deleteProduct(repo);
 
 interface UseProductActionsProps {
 	onProductDeleted?: (id: number) => void;
+	token: string | null;
 }
 
-export const useProductActions = ({ onProductDeleted }: UseProductActionsProps) => {
+export const useProductActions = ({ onProductDeleted, token }: UseProductActionsProps) => {
 	const navigate = useNavigate();
 
 	const handleEdit = useCallback((product: ProductResponse) => {
@@ -21,18 +22,23 @@ export const useProductActions = ({ onProductDeleted }: UseProductActionsProps) 
 	}, [navigate]);
 
 	const handleDelete = useCallback(async (id: number) => {
+		if (!token) {
+			alert("No authentication token available");
+			return;
+		}
+		
 		const confirm = window.confirm("Are you sure you want to delete this product?");
 		if (!confirm) return;
 
 		try {
-			await deleteProd(id);
+			await deleteProd(id, token);
 			if (onProductDeleted) {
 				onProductDeleted(id);
 			}
 		} catch (error) {
 			alert("Error deleting product");
 		}
-	}, [onProductDeleted]);
+	}, [onProductDeleted, token]);
 
 	return {
 		handleEdit,

@@ -45,6 +45,12 @@ function ProductForm({ onSuccess, onCancel, className = "" }: ProductFormProps) 
 		setLoading(true);
 		setError(null);
 
+		if (!token) {
+			setError("No authentication token available");
+			setLoading(false);
+			return;
+		}
+
 		if (!categoryId) {
 			setError("Please select a category");
 			setLoading(false);

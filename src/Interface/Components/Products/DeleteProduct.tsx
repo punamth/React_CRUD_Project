@@ -30,6 +30,12 @@ function DeleteProduct({ className = "" }: DeleteProductProps) {
 
 	useEffect(() => {
 		const fetchData = async () => {
+			if (!token) {
+				setError("No authentication token available");
+				setLoading(false);
+				return;
+			}
+
 			setError(null);
 			setLoading(true);
 			try {
@@ -56,11 +62,16 @@ function DeleteProduct({ className = "" }: DeleteProductProps) {
 	};
 
 	const handleDelete = async (id: number) => {
+		if (!token) {
+			alert("No authentication token available");
+			return;
+		}
+
 		const confirm = window.confirm("Are you sure you want to delete this product?");
 		if (!confirm) return;
 
 		try {
-			await deleteProd(id);
+			await deleteProd(id, token);
 			setProducts((prev) => prev.filter((product) => product.id !== id));
 		} catch (error) {
 			alert("Error deleting product");

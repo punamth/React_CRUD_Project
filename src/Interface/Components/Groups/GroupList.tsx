@@ -4,6 +4,7 @@ import { ProductGroupRepository } from "../../../Infrastructure/Repositories/Pro
 import { getAllProductGroups } from "../../../Application/Usecases/productGroup/getAllProductGroups";
 import GroupTable from "./GroupTable";
 import Pagination from "../common/Pagination";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductGroupRepository();
 const showAll = getAllProductGroups(repo);
@@ -19,13 +20,20 @@ function GroupList({ title = "Group List", className = "" }: GroupListProps) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	useEffect(() => {
 		const fetchGroups = async () => {
+			if (!token) {
+				setError("No authentication token available");
+				setLoading(false);
+				return;
+			}
+
 			setError(null);
 			setLoading(true);
 			try {
-				const data = await showAll();
+				const data = await showAll(token);
 				setGroups(data);
 			} catch (error) {
 				setError("Failed to load groups");
@@ -34,7 +42,7 @@ function GroupList({ title = "Group List", className = "" }: GroupListProps) {
 			}
 		};
 		fetchGroups();
-	}, []);
+	}, [token]);
 
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;

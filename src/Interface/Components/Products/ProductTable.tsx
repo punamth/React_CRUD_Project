@@ -3,6 +3,7 @@ import { useProductCategories } from "./hooks/useProductCategories";
 import { useProductActions } from "./hooks/useProductActions";
 import { ProductImageCell } from "./ProductImageCell";
 import { ProductActionButtons } from "./ProductActionButtons";
+import { useAuth } from "../Contexts/AuthContext";
 
 interface ProductTableProps {
 	products: ProductResponse[];
@@ -11,8 +12,9 @@ interface ProductTableProps {
 }
 
 function ProductTable({ products, className = "", onProductDeleted }: ProductTableProps) {
-	const { getCategoryName } = useProductCategories();
-	const { handleEdit, handleDelete } = useProductActions({ onProductDeleted });
+	const { token } = useAuth();
+	const { getCategoryName } = useProductCategories({ token });
+	const { handleEdit, handleDelete } = useProductActions({ onProductDeleted, token });
 
 	return (
 		<div className={`bg-white rounded-lg shadow-sm overflow-hidden ${className}`}>

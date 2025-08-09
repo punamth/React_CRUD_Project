@@ -4,6 +4,7 @@ import { ProductCategoryRepository } from "../../../Infrastructure/Repositories/
 import { getAllProductCategories } from "../../../Application/Usecases/productCategory/getAllProductCategories";
 import CategoryTable from "./CategoryTable";
 import Pagination from "../common/Pagination";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductCategoryRepository();
 const showAll = getAllProductCategories(repo);
@@ -19,13 +20,20 @@ function CategoryList({ title = "Category List", className = "" }: CategoryListP
 	const [currentPage, setCurrentPage] = useState(1);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	useEffect(() => {
 		const fetchCategories = async () => {
+			if (!token) {
+				setError("No authentication token available");
+				setLoading(false);
+				return;
+			}
+
 			setError(null);
 			setLoading(true);
 			try {
-				const data = await showAll();
+				const data = await showAll(token);
 				setCategories(data);
 			} catch (error) {
 				setError("Failed to load categories");
@@ -34,7 +42,7 @@ function CategoryList({ title = "Category List", className = "" }: CategoryListP
 			}
 		};
 		fetchCategories();
-	}, []);
+	}, [token]);
 
 	const handleCategoryDeleted = (id: number) => {
 		setCategories(prev => prev.filter(category => category.id !== id));

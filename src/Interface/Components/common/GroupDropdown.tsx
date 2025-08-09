@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import type { ProductGroupResponse } from "../../../Domain/Types/ProductGroupResponse";
 import { ProductGroupRepository } from "../../../Infrastructure/Repositories/ProductGroupRepository";
 import { getAllProductGroups } from "../../../Application/Usecases/productGroup/getAllProductGroups";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductGroupRepository();
 const getAllGroups = getAllProductGroups(repo);
@@ -16,11 +17,18 @@ function GroupDropdown({ onSelect, selectedGroupId, className = "" }: GroupDropd
 	const [groups, setGroups] = useState<ProductGroupResponse[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	useEffect(() => {
 		const fetchGroups = async () => {
+			if (!token) {
+				setError("No authentication token available");
+				setLoading(false);
+				return;
+			}
+
 			try {
-				const data = await getAllGroups();
+				const data = await getAllGroups(token);
 				setGroups(data);
 			} catch (error) {
 				setError("Failed to load groups");
@@ -29,7 +37,7 @@ function GroupDropdown({ onSelect, selectedGroupId, className = "" }: GroupDropd
 			}
 		};
 		fetchGroups();
-	}, []);
+	}, [token]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const value = e.target.value;

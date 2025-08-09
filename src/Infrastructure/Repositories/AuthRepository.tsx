@@ -3,27 +3,31 @@ import type { IAuthRepository } from "../../Domain/Repositories/IAuthRepository"
 import type { AuthUser } from "../../Domain/Types/AuthUser";
 
 export class AuthRepository implements IAuthRepository {
-	async login(email: string, password: string): Promise<AuthUser> {
+	async login(username: string, password: string): Promise<AuthUser> {
 		try {
 			const res = await axios.post("https://localhost:5001/api/Auth/login", {
-				Username: email, // Backend expects Username field
+				Username: username,
 				Password: password,
 			});
+
 			const data = res.data;
-			// Backend currently only returns { token }, so we create AuthUser with available data
+
+			// Build AuthUser object
 			const authUser: AuthUser = {
-				id: 0, 
-				username: email, 
-				email: email,
+				id: 0, // Placeholder until backend sends actual ID
+				username: username,
+				email: "", // Not using email login
 				token: data.token,
-				createdAt: undefined
+				createdAt: undefined,
 			};
-			return authUser;
+
+			return authUser; // Context will store it
 		} catch (error) {
 			console.error("Login failed:", error);
 			throw new Error("Login failed. Please check your credentials.");
 		}
 	}
+
 	async register(
 		name: string,
 		email: string,
@@ -31,9 +35,12 @@ export class AuthRepository implements IAuthRepository {
 		confirmPassword: string
 	): Promise<void> {
 		try {
-			console.log({ name, email, password, confirmPassword });
+			if (password !== confirmPassword) {
+				throw new Error("Passwords do not match.");
+			}
+
 			await axios.post("https://localhost:5001/api/Auth/register", {
-				Username: name, 
+				Username: name,
 				Email: email,
 				Password: password,
 			});
@@ -42,7 +49,8 @@ export class AuthRepository implements IAuthRepository {
 			throw new Error("Registration failed. Please try again.");
 		}
 	}
+
 	logout(): void {
-		// No localStorage operation here. Context will handle token removal.
+		// No localStorage clearing here — Context will handle it
 	}
 }

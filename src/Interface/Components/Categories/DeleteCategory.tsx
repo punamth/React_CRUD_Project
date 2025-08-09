@@ -3,6 +3,7 @@ import type { ProductCategoryResponse } from "../../../Domain/Types/ProductCateg
 import { ProductCategoryRepository } from "../../../Infrastructure/Repositories/ProductCategoryRepository";
 import { getAllProductCategories } from "../../../Application/Usecases/productCategory/getAllProductCategories";
 import CategoryTable from "./CategoryTable";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductCategoryRepository();
 const getAllCategories = getAllProductCategories(repo);
@@ -13,13 +14,20 @@ function DeleteCategory() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	useEffect(() => {
 		const fetchCategories = async () => {
+			if (!token) {
+				setError("No authentication token available");
+				setLoading(false);
+				return;
+			}
+
 			setError(null);
 			setLoading(true);
 			try {
-				const data = await getAllCategories();
+				const data = await getAllCategories(token);
 				setCategories(data);
 			} catch (error) {
 				setError("Failed to load categories");
@@ -28,7 +36,7 @@ function DeleteCategory() {
 			}
 		};
 		fetchCategories();
-	}, []);
+	}, [token]);
 
 	const handleCategoryDeleted = (id: number) => {
 		setCategories(prev => prev.filter(category => category.id !== id));

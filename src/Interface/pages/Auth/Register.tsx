@@ -17,16 +17,25 @@ const Register: React.FC = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   // Handle form submission (SRP - single responsibility)
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
     setError(null);
+    setSuccess(false);
     
     // Client-side validation
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setValidationError('Please fill in all fields.');
+      return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setValidationError('Please enter a valid email address.');
       return;
     }
     
@@ -43,8 +52,11 @@ const Register: React.FC = () => {
     setLoading(true);
     try {
       await register(formData.name, formData.email, formData.password, formData.confirmPassword);
-      // Redirect to login on successful registration
-      navigate('/login');
+      setSuccess(true);
+      // Redirect to login after a short delay to show success message
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Registration failed');
     } finally {
@@ -75,6 +87,13 @@ const Register: React.FC = () => {
         className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8 border border-blue-100"
       >
         <h2 className="text-3xl font-extrabold mb-8 text-center text-black-600">Register</h2>
+        
+        {/* Success Display */}
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 mb-6 rounded text-center">
+            Registration successful! Redirecting to login...
+          </div>
+        )}
         
         {/* Error Display */}
         {displayError && (

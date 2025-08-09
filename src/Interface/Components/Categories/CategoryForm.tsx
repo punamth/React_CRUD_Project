@@ -3,6 +3,7 @@ import type { ProductCategory } from "../../../Domain/Types/ProductCategory";
 import { ProductCategoryRepository } from "../../../Infrastructure/Repositories/ProductCategoryRepository";
 import { createProductCategory } from "../../../Application/Usecases/productCategory/createProductCategory";
 import GroupDropdown from "../common/GroupDropdown";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductCategoryRepository();
 const add = createProductCategory(repo);
@@ -19,11 +20,18 @@ function CategoryForm({ onSuccess, onCancel, className = "" }: CategoryFormProps
 	const [groupId, setGroupId] = useState<number | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useAuth();
 
 	const handleSubmit = useCallback(async (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
 		setError(null);
+
+		if (!token) {
+			setError("No authentication token available");
+			setLoading(false);
+			return;
+		}
 
 		if (!groupId) {
 			setError("Please select a group");
@@ -38,7 +46,7 @@ function CategoryForm({ onSuccess, onCancel, className = "" }: CategoryFormProps
 		};
 
 		try {
-			await add(categoryData);
+			await add(categoryData, token);
 			alert("Category added successfully");
 			
 			// Reset form
@@ -55,7 +63,7 @@ function CategoryForm({ onSuccess, onCancel, className = "" }: CategoryFormProps
 		} finally {
 			setLoading(false);
 		}
-	}, [name, description, groupId, onSuccess]);
+	}, [name, description, groupId, onSuccess, token]);
 
 	const handleCancel = useCallback(() => {
 		if (onCancel) {

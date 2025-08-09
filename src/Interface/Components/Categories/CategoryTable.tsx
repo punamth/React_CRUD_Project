@@ -7,6 +7,7 @@ import { ProductCategoryRepository } from "../../../Infrastructure/Repositories/
 import { ProductGroupRepository } from "../../../Infrastructure/Repositories/ProductGroupRepository";
 import { deleteProductCategory } from "../../../Application/Usecases/productCategory/deleteProductCategory";
 import { getAllProductGroups } from "../../../Application/Usecases/productGroup/getAllProductGroups";
+import { useAuth } from "../Contexts/AuthContext";
 
 const repo = new ProductCategoryRepository();
 const groupRepo = new ProductGroupRepository();
@@ -22,18 +23,24 @@ interface CategoryTableProps {
 function CategoryTable({ categories, className = "", onCategoryDeleted }: CategoryTableProps) {
 	const navigate = useNavigate();
 	const [groups, setGroups] = useState<ProductGroupResponse[]>([]);
+	const { token } = useAuth();
 
 	useEffect(() => {
 		const fetchGroups = async () => {
+			if (!token) {
+				console.error("No authentication token available");
+				return;
+			}
+
 			try {
-				const data = await getAllGroups();
+				const data = await getAllGroups(token);
 				setGroups(data);
 			} catch (error) {
 				console.error("Failed to load groups:", error);
 			}
 		};
 		fetchGroups();
-	}, []);
+	}, [token]);
 
 	const getGroupName = (groupId: number) => {
 		const group = groups.find(grp => grp.id === groupId);
@@ -47,11 +54,16 @@ function CategoryTable({ categories, className = "", onCategoryDeleted }: Catego
 	};
 
 	const handleDelete = async (id: number) => {
+		if (!token) {
+			alert("No authentication token available");
+			return;
+		}
+
 		const confirm = window.confirm("Are you sure you want to delete this category?");
 		if (!confirm) return;
 
 		try {
-			await deleteCategory(id);
+			await deleteCategory(id, token);
 			if (onCategoryDeleted) {
 				onCategoryDeleted(id);
 			}

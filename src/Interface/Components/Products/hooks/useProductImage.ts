@@ -29,7 +29,6 @@ interface UseProductImageReturn {
 	fullImageUrl: string | null;
 	hasImage: boolean;
 	handleImageError: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
-	handleImageLoad: () => void;
 }
 
 export const useProductImage = ({ imageUrl, imageFileName }: UseProductImageProps): UseProductImageReturn => {
@@ -50,15 +49,11 @@ export const useProductImage = ({ imageUrl, imageFileName }: UseProductImageProp
 			placeholder.classList.remove('hidden');
 		}
 	};
-
-	const handleImageLoad = () => {
-		console.log('Image loaded successfully:', fullImageUrl);
-	};
-
+	
 	return {
 		fullImageUrl,
 		hasImage,
 		handleImageError,
-		handleImageLoad
+		
 	};
 }; 

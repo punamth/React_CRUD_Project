@@ -30,6 +30,12 @@ function EditProduct({ className = "" }: EditProductProps) {
 
 	useEffect(() => {
 		const fetchData = async () => {
+			if (!token) {
+				setError("No authentication token available");
+				setLoading(false);
+				return;
+			}
+
 			setError(null);
 			setLoading(true);
 			try {

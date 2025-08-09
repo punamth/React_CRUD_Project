@@ -6,17 +6,27 @@ import { getAllProductCategories } from "../../../../Application/Usecases/produc
 const categoryRepo = new ProductCategoryRepository();
 const getAllCategories = getAllProductCategories(categoryRepo);
 
-export const useProductCategories = () => {
+interface UseProductCategoriesProps {
+	token: string | null;
+}
+
+export const useProductCategories = ({ token }: UseProductCategoriesProps) => {
 	const [categories, setCategories] = useState<ProductCategoryResponse[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchCategories = async () => {
+			if (!token) {
+				setError("No authentication token available");
+				setLoading(false);
+				return;
+			}
+			
 			try {
 				setLoading(true);
 				setError(null);
-				const data = await getAllCategories();
+				const data = await getAllCategories(token);
 				setCategories(data);
 			} catch (error) {
 				console.error("Failed to load categories:", error);
@@ -25,8 +35,11 @@ export const useProductCategories = () => {
 				setLoading(false);
 			}
 		};
-		fetchCategories();
-	}, []);
+		
+		if (token) {
+			fetchCategories();
+		}
+	}, [token]);
 
 	const getCategoryName = (categoryId: number): string => {
 		const category = categories.find(cat => cat.id === categoryId);

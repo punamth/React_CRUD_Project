@@ -2,12 +2,12 @@ import type { IProductGroupRepository } from "../../../Domain/Repositories/IProd
 import type { ProductGroup } from "../../../Domain/Types/ProductGroup";
 
 export function updateProductGroup(repo: IProductGroupRepository) {
-	return async (productGroup: ProductGroup): Promise<void> => {
+	return async (productGroup: ProductGroup, token: string): Promise<void> => {
 		try {
 			if (!productGroup.id || !productGroup.name) {
 				throw new Error("ID and name are required for update");
 			}
-			await repo.update(productGroup);
+			await repo.update(productGroup, token);
 		} catch (error) {
 			console.error("Failed to update product group:", error);
 			throw error;
