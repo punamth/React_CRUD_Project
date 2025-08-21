@@ -21,6 +21,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (!token) {
+        setError('No authentication token available');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -41,9 +47,7 @@ export default function Dashboard() {
       }
     };
 
-    if (token) {
-      fetchDashboardData();
-    }
+    fetchDashboardData();
   }, [token]);
 
   // Calculate statistics

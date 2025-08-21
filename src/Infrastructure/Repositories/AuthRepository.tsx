@@ -43,6 +43,7 @@ export class AuthRepository implements IAuthRepository {
 				Username: name,
 				Email: email,
 				Password: password,
+				ConfirmPassword: confirmPassword,
 			});
 		} catch (error) {
 			console.error("Registration failed:", error);
